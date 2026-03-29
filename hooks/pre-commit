@@ -8,10 +8,10 @@
 
 set -e
 
-echo "pre-commit: type checking..."
-npx tsc --noEmit
+echo "pre-commit: type checking..." >&2
+npx tsc --noEmit >&2
 
-echo "pre-commit: unit tests..."
-npx vitest run tests/unit
+echo "pre-commit: unit tests..." >&2
+npx vitest run tests/unit >&2
 
-echo "pre-commit: passed"
+echo "pre-commit: passed" >&2

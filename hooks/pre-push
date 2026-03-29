@@ -11,13 +11,13 @@
 
 set -e
 
-echo "pre-push: type checking..."
-npx tsc --noEmit
+echo "pre-push: type checking..." >&2
+npx tsc --noEmit >&2
 
-echo "pre-push: unit tests..."
-npx vitest run tests/unit
+echo "pre-push: unit tests..." >&2
+npx vitest run tests/unit >&2
 
-echo "pre-push: BDD scenarios..."
-NODE_OPTIONS='--import tsx' npx cucumber-js
+echo "pre-push: BDD scenarios..." >&2
+NODE_OPTIONS='--import tsx' npx cucumber-js >&2
 
-echo "pre-push: all checks passed"
+echo "pre-push: all checks passed" >&2

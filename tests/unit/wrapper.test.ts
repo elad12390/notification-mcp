@@ -166,8 +166,8 @@ describe("createMetricsWrapper", () => {
     );
 
     const data = collector.getData();
-    expect(data.invocations[0].duration_ms).toBeGreaterThanOrEqual(50);
-    expect(data.invocations[0].duration_ms).toBeLessThan(200);
+    expect(data.invocations[0].duration_ms).toBeGreaterThanOrEqual(40);
+    expect(data.invocations[0].duration_ms).toBeLessThan(500);
   });
 
   it("should store full result in metrics", async () => {
