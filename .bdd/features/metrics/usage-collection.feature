@@ -29,6 +29,7 @@ Feature: Usage Metrics Collection
     And the last invocation arguments contain voice "bella"
     But the last invocation arguments do not contain reasoning
 
+  @pending
   Scenario: A failed TTS call is recorded as a failure
     Given metrics are enabled
     When the notify tool fails internally

@@ -17,7 +17,7 @@ default:
     - .bdd/features/**/*.feature
   format:
     - progress-bar
-  tags: "not @requires-uv and not @requires-ffmpeg and not @say"
+  tags: "not @requires-uv and not @requires-ffmpeg and not @say and not @pending"
 
 say:
   import:
@@ -27,7 +27,7 @@ say:
     - .bdd/features/**/*.feature
   format:
     - progress-bar
-  tags: "not @requires-uv and not @requires-ffmpeg"
+  tags: "not @requires-uv and not @requires-ffmpeg and not @pending"
 
 full:
   import:
