@@ -1,0 +1,39 @@
+# Cucumber configuration for notification-mcp BDD tests
+#
+# Default profile: fast tests only (no real TTS, no uv required)
+# Run: npm run bdd
+#
+# To also run @say tests (macOS only, plays audio):
+#   npm run bdd:say
+#
+# To run the full suite including @requires-uv:
+#   npm run bdd:full
+
+default:
+  import:
+    - .bdd/support/*.ts
+    - .bdd/steps/*.ts
+  paths:
+    - .bdd/features/**/*.feature
+  format:
+    - progress-bar
+  tags: "not @requires-uv and not @requires-ffmpeg and not @say"
+
+say:
+  import:
+    - .bdd/support/*.ts
+    - .bdd/steps/*.ts
+  paths:
+    - .bdd/features/**/*.feature
+  format:
+    - progress-bar
+  tags: "not @requires-uv and not @requires-ffmpeg"
+
+full:
+  import:
+    - .bdd/support/*.ts
+    - .bdd/steps/*.ts
+  paths:
+    - .bdd/features/**/*.feature
+  format:
+    - progress-bar

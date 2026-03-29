@@ -10,12 +10,12 @@ export const CONFIG = {
    * Server name - used for identification and metrics file naming.
    * The metrics file will be saved at: ~/.mcp-metrics/{serverName}.json
    */
-  serverName: "my-mcp-server",
+  serverName: "notification-mcp",
 
   /**
    * Server version - follows semver convention.
    */
-  serverVersion: "1.0.0",
+  serverVersion: "3.0.0",
 
   /**
    * Enable metrics collection.

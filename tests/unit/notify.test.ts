@@ -1,18 +1,18 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createTestServer } from "../helpers.js";
-import { register } from "../../src/tools/echo.js";
+import { register } from "../../src/tools/notify.js";
 import { createIdentityWrapper } from "../../src/tools/wrapper.js";
 import { ServerContext } from "../../src/server.js";
 
-describe("echo tool", () => {
+describe("notify tool", () => {
   let ctx: ServerContext;
 
   beforeEach(async () => {
     ctx = await createTestServer();
   });
 
-  it("should register the echo tool on the server", () => {
+  it("should register the notify tool on the server", () => {
     // The tool is already registered via createTestServer -> createServer -> registerTools
     // This test verifies the registration doesn't throw
     expect(ctx.server).toBeDefined();

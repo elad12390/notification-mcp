@@ -1,11 +1,11 @@
 {
-  "name": "mcp-server-template",
-  "version": "1.0.0",
-  "description": "MCP Server Template - KISS & Modular",
+  "name": "@elad12390/notification-mcp",
+  "version": "3.0.0",
+  "description": "MCP server for sending notifications with high-quality AI voices (Kokoro TTS) - auto-downloads models on first use",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "mcp-server-template": "./dist/index.js"
+    "notification-mcp": "./dist/index.js"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -15,20 +15,37 @@
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "bdd": "NODE_OPTIONS='--import tsx' cucumber-js",
+    "bdd:say": "NODE_OPTIONS='--import tsx' cucumber-js --profile say",
+    "bdd:full": "NODE_OPTIONS='--import tsx' cucumber-js --profile full",
+    "test:all": "vitest run && npm run bdd"
   },
   "keywords": [
     "mcp",
-    "template"
+    "notification",
+    "tts",
+    "kokoro",
+    "ai-voice",
+    "macos"
   ],
-  "author": "",
+  "author": "elad12390",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elad12390/notification-mcp.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.24.3",
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^11.2.0",
     "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "^4.1.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"

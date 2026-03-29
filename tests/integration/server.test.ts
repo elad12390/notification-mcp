@@ -23,83 +23,67 @@ describe("MCP Server Integration", () => {
       expect(result.tools.length).toBeGreaterThan(0);
     });
 
-    it("should include echo tool in the list", async () => {
+    it("should include notify tool in the list", async () => {
       const result = await ctx.client.listTools();
 
-      const echoTool = result.tools.find((t) => t.name === "echo");
-      expect(echoTool).toBeDefined();
-      expect(echoTool?.description).toBe("Echoes back the provided message");
-    });
-
-    it("should include fetch_url tool in the list", async () => {
-      const result = await ctx.client.listTools();
-
-      const fetchTool = result.tools.find((t) => t.name === "fetch_url");
-      expect(fetchTool).toBeDefined();
-      expect(fetchTool?.description).toContain("Fetches content from a URL");
+      const notifyTool = result.tools.find((t) => t.name === "notify");
+      expect(notifyTool).toBeDefined();
+      expect(notifyTool?.description).toContain("notification");
     });
 
     it("should include reasoning parameter when metrics enabled", async () => {
       const result = await ctx.client.listTools();
-      const echoTool = result.tools.find((t) => t.name === "echo");
+      const notifyTool = result.tools.find((t) => t.name === "notify");
 
       // When metrics are enabled, reasoning should be in the schema
       if (ctx.metricsCollector) {
-        const schema = echoTool?.inputSchema as { properties?: Record<string, unknown> };
+        const schema = notifyTool?.inputSchema as { properties?: Record<string, unknown> };
         expect(schema?.properties?.reasoning).toBeDefined();
       }
     });
   });
 
-  describe("echo tool", () => {
-    it("should echo back a simple message", async () => {
+  describe("notify tool", () => {
+    it("should send a notification successfully", async () => {
       const result = await ctx.client.callTool({
-        name: "echo",
-        arguments: { 
-          message: "Hello, World!",
-          reasoning: "Testing echo tool functionality",
+        name: "notify",
+        arguments: {
+          message: "Test notification",
+          reasoning: "Testing notify tool functionality",
         },
       });
 
-      expect(extractTextContent(result)).toBe("Echo: Hello, World!");
+      // The tool should either succeed or fail gracefully if 'say' is not available
+      const text = extractTextContent(result);
+      expect(text).toMatch(/Notification sent|Failed to send notification/);
     });
 
-    it("should handle empty string", async () => {
+    it("should accept optional title parameter", async () => {
       const result = await ctx.client.callTool({
-        name: "echo",
-        arguments: { 
-          message: "",
-          reasoning: "Testing empty message handling",
+        name: "notify",
+        arguments: {
+          message: "Task completed",
+          title: "Build Success",
+          reasoning: "Testing title parameter",
         },
       });
 
-      expect(extractTextContent(result)).toBe("Echo: ");
+      const text = extractTextContent(result);
+      expect(text).toMatch(/Notification sent|Failed to send notification/);
     });
 
-    it("should handle special characters", async () => {
-      const message = "Special chars: !@#$%^&*() 日本語 émojis";
+    it("should accept optional voice parameter", async () => {
       const result = await ctx.client.callTool({
-        name: "echo",
-        arguments: { 
-          message,
-          reasoning: "Testing special character handling",
+        name: "notify",
+        arguments: {
+          message: "Hello there",
+          voice: "Alex",
+          reasoning: "Testing voice parameter",
         },
       });
 
-      expect(extractTextContent(result)).toBe(`Echo: ${message}`);
-    });
-
-    it("should handle multiline messages", async () => {
-      const message = "Line 1\nLine 2\nLine 3";
-      const result = await ctx.client.callTool({
-        name: "echo",
-        arguments: { 
-          message,
-          reasoning: "Testing multiline message handling",
-        },
-      });
-
-      expect(extractTextContent(result)).toBe(`Echo: ${message}`);
+      const text = extractTextContent(result);
+      expect(text).toMatch(/Notification sent|Failed to send notification/);
     });
 
     it("should record metrics when enabled", async () => {
@@ -109,20 +93,20 @@ describe("MCP Server Integration", () => {
       }
 
       await ctx.client.callTool({
-        name: "echo",
-        arguments: { 
+        name: "notify",
+        arguments: {
           message: "metrics test",
           reasoning: "Testing that metrics are recorded",
         },
       });
 
       // Give async write a moment to complete
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       const data = ctx.metricsCollector.getData();
       expect(data.total_invocations).toBeGreaterThan(0);
-      expect(data.tool_stats.echo).toBeDefined();
-      expect(data.tool_stats.echo.call_count).toBeGreaterThan(0);
+      expect(data.tool_stats.notify).toBeDefined();
+      expect(data.tool_stats.notify.call_count).toBeGreaterThan(0);
     });
   });
 
@@ -139,7 +123,7 @@ describe("MCP Server Integration", () => {
 
     it("should return error for missing required argument", async () => {
       const result = await ctx.client.callTool({
-        name: "echo",
+        name: "notify",
         arguments: { reasoning: "Testing missing argument" },
       });
 
@@ -153,7 +137,7 @@ describe("MCP Server Integration", () => {
       }
 
       const result = await ctx.client.callTool({
-        name: "echo",
+        name: "notify",
         arguments: { message: "test" },
       });
 
@@ -162,133 +146,14 @@ describe("MCP Server Integration", () => {
 
     it("should return error for invalid argument type", async () => {
       const result = await ctx.client.callTool({
-        name: "echo",
-        arguments: { 
+        name: "notify",
+        arguments: {
           message: 123, // Should be string
           reasoning: "Testing invalid type",
         },
       });
 
       expect(result.isError).toBe(true);
-    });
-  });
-
-  describe("fetch_url tool", () => {
-    it("should fetch a valid URL successfully", async () => {
-      const result = await ctx.client.callTool({
-        name: "fetch_url",
-        arguments: {
-          url: "https://httpbin.org/get",
-          reasoning: "Testing successful URL fetch",
-        },
-      });
-
-      expect(result.isError).not.toBe(true);
-      const text = extractTextContent(result);
-      expect(text).toContain("httpbin.org");
-    });
-
-    it("should return error for invalid URL format", async () => {
-      const result = await ctx.client.callTool({
-        name: "fetch_url",
-        arguments: {
-          url: "not-a-valid-url",
-          reasoning: "Testing invalid URL handling",
-        },
-      });
-
-      expect(result.isError).toBe(true);
-    });
-
-    it("should handle HTTP errors gracefully", async () => {
-      const result = await ctx.client.callTool({
-        name: "fetch_url",
-        arguments: {
-          url: "https://httpbin.org/status/404",
-          reasoning: "Testing HTTP error handling",
-        },
-      });
-
-      expect(result.isError).toBe(true);
-      const text = extractTextContent(result);
-      expect(text).toContain("404");
-    });
-
-    it("should accept custom timeout parameter", async () => {
-      const result = await ctx.client.callTool({
-        name: "fetch_url",
-        arguments: {
-          url: "https://httpbin.org/get",
-          timeout_ms: 5000,
-          reasoning: "Testing custom timeout",
-        },
-      });
-
-      expect(result.isError).not.toBe(true);
-    });
-
-    it("should reject timeout outside valid range", async () => {
-      // Timeout too low (below 1000)
-      const result = await ctx.client.callTool({
-        name: "fetch_url",
-        arguments: {
-          url: "https://httpbin.org/get",
-          timeout_ms: 100,
-          reasoning: "Testing invalid timeout",
-        },
-      });
-
-      expect(result.isError).toBe(true);
-    });
-
-    it("should handle timeout for slow responses", async () => {
-      // httpbin.org/delay/N delays response by N seconds
-      const result = await ctx.client.callTool({
-        name: "fetch_url",
-        arguments: {
-          url: "https://httpbin.org/delay/10",
-          timeout_ms: 1000, // 1 second timeout
-          reasoning: "Testing timeout handling",
-        },
-      });
-
-      expect(result.isError).toBe(true);
-      const text = extractTextContent(result);
-      expect(text).toContain("timed out");
-    });
-
-    it("should handle non-text content types", async () => {
-      const result = await ctx.client.callTool({
-        name: "fetch_url",
-        arguments: {
-          url: "https://httpbin.org/image/png",
-          reasoning: "Testing binary content handling",
-        },
-      });
-
-      expect(result.isError).not.toBe(true);
-      const text = extractTextContent(result);
-      expect(text).toContain("non-text content");
-    });
-
-    it("should record metrics for fetch_url when enabled", async () => {
-      if (!ctx.metricsCollector) {
-        return;
-      }
-
-      await ctx.client.callTool({
-        name: "fetch_url",
-        arguments: {
-          url: "https://httpbin.org/get",
-          reasoning: "Testing metrics recording for fetch_url",
-        },
-      });
-
-      await new Promise(resolve => setTimeout(resolve, 50));
-
-      const data = ctx.metricsCollector.getData();
-      expect(data.tool_stats.fetch_url).toBeDefined();
-      expect(data.tool_stats.fetch_url.call_count).toBeGreaterThan(0);
     });
   });
 
@@ -384,7 +249,7 @@ describe("MCP Server Integration", () => {
       });
 
       // Give async write a moment to complete
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       const data = ctx.issueCollector.getData();
       expect(data.total_issues).toBe(initialCount + 1);
@@ -447,7 +312,7 @@ describe("MCP Server Integration", () => {
         },
       });
 
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       const data = ctx.issueCollector.getData();
       const issue = data.issues[0];

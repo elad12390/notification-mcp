@@ -4,6 +4,9 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createServer, ServerContext } from "../src/server.js";
 import { MetricsCollector, IssueCollector } from "../src/metrics/index.js";
 
+// Enable dry run mode for tests - skip actual TTS
+process.env.NOTIFICATION_DRY_RUN = "true";
+
 /**
  * Test context containing both server and client for integration tests.
  */

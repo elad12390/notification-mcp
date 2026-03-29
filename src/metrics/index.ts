@@ -5,15 +5,17 @@
 export { MetricsCollector } from "./collector.js";
 export { IssueCollector } from "./issues.js";
 export { registerReportIssueTool } from "./report_issue_tool.js";
-export {
+export type {
   MetricsData,
   ToolInvocation,
   ToolStats,
-  createEmptyMetricsData,
   IssuesData,
   IssueReport,
   IssueSeverity,
   IssueCategory,
+} from "./types.js";
+export {
+  createEmptyMetricsData,
   ISSUE_SEVERITY_LEVELS,
   ISSUE_CATEGORIES,
   createEmptyIssuesData,
