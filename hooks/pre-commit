@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# pre-commit hook for notification-mcp
+#
+# Runs type checking and unit tests before allowing a commit.
+# Install: npm run hooks:install
+#
+
+set -e
+
+echo "pre-commit: type checking..."
+npx tsc --noEmit
+
+echo "pre-commit: unit tests..."
+npx vitest run tests/unit
+
+echo "pre-commit: passed"

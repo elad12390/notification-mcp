@@ -19,7 +19,9 @@
     "bdd": "NODE_OPTIONS='--import tsx' cucumber-js",
     "bdd:say": "NODE_OPTIONS='--import tsx' cucumber-js --profile say",
     "bdd:full": "NODE_OPTIONS='--import tsx' cucumber-js --profile full",
-    "test:all": "vitest run && npm run bdd"
+    "test:all": "vitest run && npm run bdd",
+    "hooks:install": "sh hooks/install.sh",
+    "prepare": "sh hooks/install.sh"
   },
   "keywords": [
     "mcp",

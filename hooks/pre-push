@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# pre-push hook for notification-mcp
+#
+# Runs the full test suite (vitest + BDD) before allowing a push.
+# Install: npm run hooks:install
+#
+
+set -e
+
+echo "pre-push: type checking..."
+npx tsc --noEmit
+
+echo "pre-push: vitest (unit + integration)..."
+npx vitest run
+
+echo "pre-push: BDD scenarios..."
+NODE_OPTIONS='--import tsx' npx cucumber-js
+
+echo "pre-push: all checks passed"
